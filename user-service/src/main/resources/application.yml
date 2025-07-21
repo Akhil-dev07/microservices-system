@@ -1,0 +1,31 @@
+server:
+  port: 8081  # Unique port number on which the user-service will run
+
+spring:
+  application:
+    name: user-service  # Service name registered in Eureka and used for config lookup
+
+  config:
+    import: "configserver:"  # In Spring Boot 3.1+, used to import external config from Spring Cloud Config Server
+
+  cloud:
+    config:
+      uri: http://localhost:8888  # URL where Spring Cloud Config Server is hosted
+      fail-fast: true  # Fail the app startup immediately if config server is not reachable
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/userdb  # JDBC URL to connect to the MySQL database named 'userdb'
+    username: root  # Database username
+    password: root  # Database password
+    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL JDBC driver class
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # Automatically creates/updates database tables based on entity classes
+    show-sql: true  # Logs generated SQL queries to the console for debugging
+    database-platform: org.hibernate.dialect.MySQLDialect  # Hibernate dialect for MySQL
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka  # Eureka Server URL where this service will register itself

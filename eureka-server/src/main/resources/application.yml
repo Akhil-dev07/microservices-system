@@ -1,0 +1,19 @@
+# ------------------------------------------------------------
+# Eureka Server Configuration (Standalone, not part of a cluster)
+# Access Dashboard: http://localhost:8761/
+# ------------------------------------------------------------
+
+# This configures the port where the Eureka server will run
+server:
+  port: 8761  # Eureka server accessible at http://localhost:8761/
+
+spring:
+  application:
+    name: eureka-server  # Application name registered in Spring context
+
+eureka:
+  client:
+    register-with-eureka: false  # Do not register this Eureka server with another Eureka server
+    fetch-registry: false        # Do not fetch registry from other Eureka servers (acts as standalone)
+  server:
+    wait-time-in-ms-when-sync-empty: 0  # No wait time if registry is initially empty (improves startup time)

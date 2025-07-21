@@ -1,0 +1,96 @@
+#  Your bootstrap.yml is ignored because Spring Boot 3.1+ doesn't load bootstrap.yml by default anymore.
+#  It was part of the legacy Spring Cloud bootstrap process.
+spring:
+  application:
+    name: gateway-service  # This name is important! It must match the name used in config-server (gateway-service.yml)
+
+  config:
+    import: "configserver:"  # ✅ Instructs Spring Boot to import configuration from the Config Server
+
+  cloud:
+    config:
+      uri: http://localhost:8888       # ✅ URL of the Spring Cloud Config Server
+      fail-fast: true                  # ✅ Fail the app startup immediately if the config server is not reachable
+
+    gateway:
+      mvc:
+        routes:
+        # ----------------------------- #
+        # Route for User Service
+        # ----------------------------- #
+        - id: user-service # A unique ID for this route
+          uri: lb://user-service  # lb:// = Load-balanced URI resolved using Eureka
+          predicates:
+            - Path=/api/users/**  # Incoming requests that match this path will be routed to user-service
+#          filters:
+#            - StripPrefix=2  # Removes the first 2 segments of the path (i.e., /api/users) before forwarding
+
+        # ----------------------------- #
+        # Route for Product Service
+        # ----------------------------- #
+        - id: product-service
+          uri: lb://product-service  # lb = Load Balancer (Eureka aware)
+          predicates:
+            - Path=/api/products/**  # Routes with /api/products/... go to product-service
+#          filters:
+#            - StripPrefix=2  # Forwards only the remaining path after stripping /api/products
+
+        # ----------------------------- #
+        # Route for Order Service
+        # ----------------------------- #
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+#          filters:
+#            - StripPrefix=2
+
+        # ----------------------------- #
+        # Route for Payment Service
+        # ----------------------------- #
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+#          filters:
+#            - StripPrefix=2
+  # ✅ Route for Auth Service (Used for login/register)
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+
+# ----------------------------------------------------------
+# Spring Boot embedded server configuration
+# ----------------------------------------------------------
+server:
+  port: 8080  # The API Gateway will run on port 8080. You access it at http://localhost:8080/
+
+# ----------------------------------------------------------
+# Eureka Discovery Client configuration
+# ----------------------------------------------------------
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+      # This is where your gateway-service will register itself
+      # It also uses this URL to discover other services like user-service, product-service, etc.
+
+#  Enable Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    endpoint:
+      health:
+        show-details: always
+
+#  http://localhost:8080/actuator/gateway/routes
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+
+

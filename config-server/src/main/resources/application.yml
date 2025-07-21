@@ -1,0 +1,19 @@
+server:
+  port: 8888 # The config server will run on port 8888
+  #Start the application. Open your browser and visit http://localhost:8888/user-service/defaul
+spring:
+  application:
+    name: config-server # This is the name of the config server application (used in service discovery)
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/Akhil-dev07/microservices-config # Replace with the actual GitHub URL of your config repo (it stores all service config files)
+          clone-on-start: true # Automatically clone the config repo when the config server starts
+          default-label: main # Git branch to use (usually 'main' or 'master')
+
+# NOTE:
+# - This config server will serve application config files from your GitHub repo.
+# - Make sure your config repo is public or has proper authentication if private.
+# - Example file in your config repo: user-service.yml, product-service.yml, etc.
